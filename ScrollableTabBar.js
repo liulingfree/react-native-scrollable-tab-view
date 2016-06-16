@@ -11,6 +11,7 @@ const {
   findNodeHandle,
   Dimensions,
 } = ReactNative;
+const Button = require('./Button');
 
 const WINDOW_WIDTH = Dimensions.get('window').width;
 
@@ -125,29 +126,25 @@ const ScrollableTabBar = React.createClass({
     const textColor = isTabActive ? activeTextColor : inactiveTextColor;
     const fontWeight = isTabActive ? 'bold' : 'normal';
 
-    return <TouchableOpacity
+    return <Button
       key={`${name}_${page}`}
-      ref={'tab_' + page}
       accessible={true}
       accessibilityLabel={name}
       accessibilityTraits='button'
-      style={[styles.tab, this.props.tabStyle]}
       onPress={() => this.props.goToPage(page)}
       onLayout={this.measureTab.bind(this, page)}
     >
-      <Text style={[{color: textColor, fontWeight, }, textStyle, ]}>
-        {name}
-      </Text>
-    </TouchableOpacity>;
+      <View style={[styles.tab, this.props.tabStyle]}>
+        <Text style={[{color: textColor, fontWeight, }, textStyle, ]}>
+          {name}
+        </Text>
+      </View>
+    </Button>;
   },
 
-  measureTab(page) {
-    const tabContainerhandle = findNodeHandle(this.refs.tabContainer);
-    this.refs['tab_' + page].measureLayout(tabContainerhandle, (ox, oy, width, height, pageX, pageY) => {
-      this._tabsMeasurements[page] = {left: ox, right: ox + width, width: width, height: height, };
-
-      this.updateView({value: this.props.scrollValue._value, });
-    });
+  measureTab(page, event) {
+    const { x, width, height, } = event.nativeEvent.layout;
+    this._tabsMeasurements[page] = {left: x, right: x + width, width: width, height: height, };
   },
 
   render() {
